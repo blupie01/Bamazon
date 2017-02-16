@@ -26,7 +26,7 @@ connection.connect();
 // Include the ids, names, and prices of products for sale.
 var startOrder = function() {
 
-	connection.query("SELECT id, product_name, price FROM products", function (error, results) 
+	connection.query("SELECT id, product_name, price, stock_quantity FROM products", function (error, results) 
 	{
 		// output results into terminal cleanly.
 		for (var i = 0; i < results.length; i++) {
@@ -44,32 +44,49 @@ var startOrder = function() {
 		name: "product_id",
 		message: "Please enter the product ID you would like to purchase: ",
 		validate: function(value) {
-      			if (isNaN(value) === false) {
+      			if (isNaN(value) === false && value > 0) {
         			return true;
-      			}
-      			return false;
-    			}		
+      			} else {
+      				return false;
+      			}	
+      		}	
 		}, {
 		type: "input",
 		name: "purchase_quant",
 		message: "Quantity you want to purchase: ",
 		validate: function(value) {
-      			if (isNaN(value) === false) {
+      			if (isNaN(value) === false && value > 0) {
         			return true;
-      			}
-      			return false;
+      			} else {
+      				return false;
     			}
+    		}
 		}]).then(function(data) {
 			var id = data.product_id;
 			var quant = data.purchase_quant;
 
 			console.log(id, quant);
+
+			connection.query("SELECT price, stock_quantity FROM products WHERE id = " + id, function (error, results) {
+				var stockQuant = results.stock_quantity;
+
+				if (stockQuant - quant < 0) {
+					console.log("Your order could not be placed. We do not have enough in stock.");
+				} else {
+					
+				}
+			});
+
 		});
 
 	}
 )};	
 
 startOrder();
+
+// var checkInventory = function() {
+// 	connection.query()
+// }
 
 // The first should ask them the ID of the product they would like to buy.
 	// The second message should ask how many units of the product they would like to buy.
