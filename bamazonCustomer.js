@@ -1,15 +1,3 @@
-// If not, the app should log a phrase like Insufficient quantity!, 
-// and then prevent the order from going through.
-// However, if your store does have enough of the product, 
-// you should fulfill the customer's order.
-
-// This means updating the SQL database to reflect the remaining quantity.
-// Once the update goes through, show the customer the total cost of their purchase.
-// Also insert a record into the sales table with the product_id and quantity 
-// purchased and current timestamp
-
-//----------------------------------------------------------------------------------------------
-
 var mysql = require('mysql');
 var inquirer = require('inquirer');
 
@@ -21,6 +9,8 @@ var connection = mysql.createConnection({
 });
 
 connection.connect();
+
+var order = [];
 
 // Running this application will first display all of the items available for sale. 
 // Include the ids, names, and prices of products for sale.
@@ -44,7 +34,7 @@ var startOrder = function() {
 		name: "product_id",
 		message: "Please enter the product ID you would like to purchase: ",
 		validate: function(value) {
-      			if (isNaN(value) === false && value > 0) {
+      			if (isNaN(value) === false && value > 0 && value < results.length) {
         			return true;
       			} else {
       				return false;
@@ -64,149 +54,65 @@ var startOrder = function() {
 		}]).then(function(data) {
 			var id = data.product_id;
 			var quant = data.purchase_quant;
+			var item_name = results[id - 1].product_name;
+			var item_price = results[id - 1].price;
+			var item = {};
 
-			console.log(id, quant);
+			if (results[id - 1].stock_quantity - quant < 0 ) {
+				console.log("Your order could not be placed. We do not have enough in stock.");
+			} else {
+				connection.query("UPDATE products SET stock_quantity = (stock_quantity - " + quant + ") WHERE id = " + id, function (error, results) 
+				{
+					if (error) {
+						return console.log("There was an error updating the products table.");
+					};
+				});
 
-			connection.query("SELECT price, stock_quantity FROM products WHERE id = " + id, function (error, results) {
-				var stockQuant = results.stock_quantity;
+				connection.query("INSERT INTO sales (product_id, quantity_purchased) VALUES (" + id + ", " + quant + ")", function (error, results) 
+				{
+					if (error) {
+						return console.log("Error inserting into sales table.");
+					};
+				});
 
-				if (stockQuant - quant < 0) {
-					console.log("Your order could not be placed. We do not have enough in stock.");
-				} else {
-					
-				}
-			});
+				item["item"] = item_name;
+				item["price"] = item_price;
+				item["quantity"] = quant;
 
+				order.push(item);
+
+				shopMore();
+			};
 		});
+	});
+};	
 
-	}
-)};	
+//-----------------FUNCTIONS-------------------------------------------------------
+var shopMore = function() {
+	inquirer.prompt({
+		type: "confirm",
+		name: "shopMore",
+		message: "Are you done shopping? "
+	}).then(function(data) {
+		if (!data.shopMore) {
+			startOrder();
+		} else {
+			checkOut();
+		};
+	});
+};
+
+var checkOut = function() {
+	var total = 0;
+	console.log("\nYou purchased: ");
+
+	for (var i = 0; i < order.length; i++) {
+		console.log("Item " + (i + 1) + ": " + order[i].item + " Quantity: " + order[i].quantity + " Price: " + order[i].price);
+		total += (order[i].price * order[i].quantity);
+	};
+
+	console.log("Your total is: $" + total);
+	console.log("Thank you! Come again!");
+};
 
 startOrder();
-
-// var checkInventory = function() {
-// 	connection.query()
-// }
-
-// The first should ask them the ID of the product they would like to buy.
-	// The second message should ask how many units of the product they would like to buy.
-	// Once the customer has placed the order, your application should check if your 
-	// store has enough of the product to meet the customer's request.
-		
-// 		inquirer.prompt([{
-// 			type: "input",
-// 			name: "product_id",
-// 			message: "Please enter the product ID you would like to purchase: ",
-// 			validate: function(value) {
-//       					if (isNaN(value) === false) {
-//         					return true;
-//       					}
-//       					return false;
-//     				  }		
-// 		}, {
-// 			type: "input",
-// 			name: "purchase_quant",
-// 			message: "Quantity you want to purchase: ",
-// 			validate: function(value) {
-//       					if (isNaN(value) === false) {
-//         					return true;
-//       					}
-//       					return false;
-//     				  }
-// 		}]).then(function(data) {
-
-// 		});
-//   	});
-// };
-
-
-
-// var updateInventory = function(quantity) {
-// 	connection.query("UPDATE " + table + " SET ? WHERE ?", [{
-// 		name : 'bruno beer'
-// 	  }, {
-// 	  	id : id
-// 	  }], function(err, res) { 
-// 	  	if (err) return console.log(err);
-// 	  	console.log('update completed!')
-// 	  });
-
-	// connection.query("UPDATE products )
-// }
-
-//NOT IN USE---------------------------------------------------------------------------------
-// function selectTable(table){
-// 	connection.query('SELECT * from ' + table, function (error, results, fields) {
-// 	  if (error) throw error;
-// 	  console.log(results);
-// 	});
-// }
-//--------------------------------------------------------------------------------------------
-// connection.query('SELECT * from drankers', function (error, results, fields)
-// {
-// 	console.log(results);
-// 	console.log('\n');
-
-// 	inquirer.prompt([
-// 	{type: "input",
-// 	  name: "dranker_id",
-// 	  message: "Put the id of the dranker you are."}
-// 	]).then(function(data){
-// 		var dranker = data.dranker_id;
-
-// 		connection.query('SELECT * from beers', function (error, results, fields) {
-// 			console.log(results);
-// 			console.log('\n');
-// 			inquirer.prompt([
-// 			{type: "input",
-// 			  name: "beer_id",
-// 			  message: "Put the id of the beer that you want."}
-// 			]).then(function(data){
-// 				//do an insert into mysql 
-// 				connection.query('INSERT into dranken_beers SET ?', {
-// 					beer_id : data.beer_id,
-// 					dranker_id : dranker
-// 				}, function (error, results, fields) {
-// 					console.log('insert complete')
-// 				});
-// 			});
-// 		});
-
-// 	});
-// });
-
-// function insertIntoTable(name, type, abv, table){
-//   connection.query("INSERT INTO " + table + " SET ?", {
-//       name: name,
-//       type: type,
-//       abv: abv
-//     }, function(err, res) { console.log('completed!')});
-// }
-
-// function deleteFromTable(id, table){
-// 	connection.query("DELETE FROM " + table + " WHERE ?", {
-// 	    id: id
-// 	  }, function(err, res) { 
-// 	  	if (err) return console.log(err);
-// 	  	console.log('delete completed!')
-// 	  });
-// }
-
-// //write update function
-// function updateTable(id, table){
-// 	connection.query("UPDATE " + table + " SET ? WHERE ?", [{
-// 		name : 'bruno beer'
-// 	  }, {
-// 	  	id : id
-// 	  }], function(err, res) { 
-// 	  	if (err) return console.log(err);
-// 	  	console.log('update completed!')
-// 	  });
-// }
-
-// //write delete function
-
-
-// // insertIntoTable('beer', 'i dont know beer', 100, 'beers');
-// // deleteFromTable(7, 'beers');
-// updateTable(1, 'beers');
