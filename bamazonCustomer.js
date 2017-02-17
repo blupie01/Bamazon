@@ -34,7 +34,7 @@ var startOrder = function() {
 		name: "product_id",
 		message: "Please enter the product ID you would like to purchase: ",
 		validate: function(value) {
-      			if (isNaN(value) === false && value > 0 && value < results.length) {
+      			if (isNaN(value) === false && value > 0 && value < results.length + 1) {
         			return true;
       			} else {
       				return false;
@@ -59,7 +59,8 @@ var startOrder = function() {
 			var item = {};
 
 			if (results[id - 1].stock_quantity - quant < 0 ) {
-				console.log("Your order could not be placed. We do not have enough in stock.");
+				console.log("\nYour order could not be placed. We do not have enough in stock.\n");
+				startOrder();
 			} else {
 				connection.query("UPDATE products SET stock_quantity = (stock_quantity - " + quant + ") WHERE id = " + id, function (error, results) 
 				{
@@ -113,6 +114,7 @@ var checkOut = function() {
 
 	console.log("Your total is: $" + total);
 	console.log("Thank you! Come again!");
+	connection.end();
 };
 
 startOrder();
