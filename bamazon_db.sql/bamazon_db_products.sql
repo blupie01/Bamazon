@@ -31,7 +31,7 @@ CREATE TABLE `products` (
   PRIMARY KEY (`id`),
   KEY `department_id` (`department_id`),
   CONSTRAINT `products_ibfk_1` FOREIGN KEY (`department_id`) REFERENCES `departments` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -40,7 +40,7 @@ CREATE TABLE `products` (
 
 LOCK TABLES `products` WRITE;
 /*!40000 ALTER TABLE `products` DISABLE KEYS */;
-INSERT INTO `products` VALUES (1,'Green Tea',3,4.50,47589),(2,'Jasmine Tea',3,6.95,687989),(3,'Black Tea',3,7.65,5567),(4,'Peppermint Tea',3,4.50,2344),(5,'Barley Tea',3,7.60,350),(6,'Dishonored 2',1,75.00,6879),(7,'For Honor',1,85.00,23455),(8,'Oranges',2,6.95,34532),(9,'Potatoes',2,1.95,23412),(10,'Brussel Sprouts',2,3.95,9987),(11,'Carrots',2,2.95,12345);
+INSERT INTO `products` VALUES (1,'Green Tea',3,4.50,47578),(2,'Jasmine Tea',3,6.95,687989),(3,'Black Tea',3,7.65,5267),(4,'Peppermint Tea',3,4.50,1994),(5,'Barley Tea',3,7.60,1584),(6,'Dishonored 2',1,75.00,6879),(7,'For Honor',1,85.00,23443),(8,'Oranges',2,6.95,34397),(9,'Potatoes',2,1.95,23412),(10,'Brussel Sprouts',2,3.95,10000),(11,'Carrots',2,2.95,12320),(12,'OverWatch',1,39.99,3),(13,'Strawberries',2,4.95,3),(14,'Lavender Tea',3,6.99,678);
 /*!40000 ALTER TABLE `products` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -53,4 +53,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-02-15 13:13:42
+-- Dump completed on 2017-02-17 20:35:01
