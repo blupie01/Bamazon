@@ -173,7 +173,7 @@ function displayMenu() {
 
 displayMenu();
 
-function restartMenu() {
+function restart() {
 	inquirer.prompt([{
 		type: "confirm",
 		name: "restart",
@@ -189,18 +189,18 @@ function restartMenu() {
 
 
 
-function restartOpOne() {
+// function restartOpOne() {
 
-}
+// }
 
-function restartOpTwo() {
+// function restartOpTwo() {
 
-}
+// }
 
-function restartOpThree() {
+// function restartOpThree() {
 
-}
+// }
 
-function restartOpFour() {
+// function restartOpFour() {
 	
-}
+// }
